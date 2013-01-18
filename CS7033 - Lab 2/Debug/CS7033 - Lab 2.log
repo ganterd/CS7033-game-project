@@ -1,0 +1,75 @@
+﻿Build started 19/12/2012 17:05:36.
+     1>Project "C:\Users\ganterd\Desktop\CS7033 - Game Current\CS7033 - Lab 2\CS7033 - Lab 2.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\CS7033 - Game.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Debug\CS7033 - Game.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I".\glew-1.9.0\include" /I.\glm /I.\freeglut\include /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Camera.cpp ControllingMesh.cpp glfont.cpp Importer.cpp Level.cpp main.cpp Model.cpp Projectile.cpp Shader.cpp textureTGA.cpp Zombie.cpp ZombieController.cpp
+         ZombieController.cpp
+         Zombie.cpp
+         textureTGA.cpp
+         Shader.cpp
+         Projectile.cpp
+         Model.cpp
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\model.cpp(245): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\model.cpp(267): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\model.cpp(289): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+         main.cpp
+         Level.cpp
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\level.cpp(108): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+         Importer.cpp
+         glfont.cpp
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\glfont.cpp(32): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files\microsoft visual studio 10.0\vc\include\stdio.h(234) : see declaration of 'fopen'
+         ControllingMesh.cpp
+         Camera.cpp
+     1>c:\users\ganterd\desktop\cs7033 - game current\cs7033 - lab 2\camera.cpp(144): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\CS7033 - Game.exe.embed.manifest.res" "Debug\CS7033 - Game_manifest.rc" 
+       Link:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\\CS7033 - Game.exe" /INCREMENTAL /NOLOGO /LIBPATH:".\glew-1.9.0\lib" /LIBPATH:.\devIL\lib /LIBPATH:".\assimp\lib\assimp_debug-dll_win32" /LIBPATH:.\freeglut\lib\x86\Debug glew32.lib freeglut.lib assimp.lib DevIL.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\CS7033 - Game.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\CS7033 - Game.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\\CS7033 - Game.lib" /MACHINE:X86 /PROFILE "Debug\CS7033 - Game.exe.embed.manifest.res"
+         Debug\Camera.obj
+         Debug\ControllingMesh.obj
+         Debug\glfont.obj
+         Debug\Importer.obj
+         Debug\Level.obj
+         Debug\main.obj
+         Debug\Model.obj
+         Debug\Projectile.obj
+         Debug\Shader.obj
+         Debug\textureTGA.obj
+         Debug\Zombie.obj
+         Debug\ZombieController.obj
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
+     1>Camera.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
+       Manifest:
+         Deleting file "Debug\CS7033 - Game.exe.embed.manifest".
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\CS7033 - Game.exe.embed.manifest" /manifest "Debug\CS7033 - Game.exe.intermediate.manifest"
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\CS7033 - Game.exe.embed.manifest.res" "Debug\CS7033 - Game_manifest.rc" 
+       LinkEmbedManifest:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\\CS7033 - Game.exe" /INCREMENTAL /NOLOGO /LIBPATH:".\glew-1.9.0\lib" /LIBPATH:.\devIL\lib /LIBPATH:".\assimp\lib\assimp_debug-dll_win32" /LIBPATH:.\freeglut\lib\x86\Debug glew32.lib freeglut.lib assimp.lib DevIL.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\CS7033 - Game.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\CS7033 - Game.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\\CS7033 - Game.lib" /MACHINE:X86 /PROFILE "Debug\CS7033 - Game.exe.embed.manifest.res"
+         Debug\Camera.obj
+         Debug\ControllingMesh.obj
+         Debug\glfont.obj
+         Debug\Importer.obj
+         Debug\Level.obj
+         Debug\main.obj
+         Debug\Model.obj
+         Debug\Projectile.obj
+         Debug\Shader.obj
+         Debug\textureTGA.obj
+         Debug\Zombie.obj
+         Debug\ZombieController.obj
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/PROFILE' specification
+     1>Camera.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:REF' specification
+         CS7033 - Lab 2.vcxproj -> C:\Users\ganterd\Desktop\CS7033 - Game Current\Debug\\CS7033 - Game.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\CS7033 - Game.unsuccessfulbuild".
+         Touching "Debug\CS7033 - Game.lastbuildstate".
+     1>Done Building Project "C:\Users\ganterd\Desktop\CS7033 - Game Current\CS7033 - Lab 2\CS7033 - Lab 2.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:15.01
