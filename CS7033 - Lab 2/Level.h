@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "ControllingMesh.h"
 #include <string>
+#include <pthread.h>
 
 #define LEVELS_FOLDER "resources/levels/"
 #define LEVEL_BOUNDARY 0

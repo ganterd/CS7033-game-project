@@ -9,6 +9,7 @@ Model::Model(){
 		0, 0, 1,
 		0, -1, 0
 	);
+
 	gettingVertsAndNormals = false;
 }
 
@@ -109,7 +110,11 @@ void Model::initTextures(const aiScene* scene) {
 		}
 	}
 
-	int numTextures = textureIdMap.size();
+	int numTextures(textureIdMap.size());
+
+	/* Because we're using static libs to load textures */
+	/* we need to mutex lock this section               */
+	pthread_mutex_lock(&_loadTextureMutex);
 
 	/* create and fill array with DevIL texture ids */
 	ILuint* imageIds = new ILuint[numTextures];
@@ -121,17 +126,15 @@ void Model::initTextures(const aiScene* scene) {
 
 	/* get iterator */
 	std::map<std::string, GLuint>::iterator itr = textureIdMap.begin();
-	printf("TextureIDMap Begin %i\n", textureIdMap.begin());
 	int i=0;
 	for (; itr != textureIdMap.end(); ++i, ++itr) {
 		//save IL image ID
 		std::string filename = (*itr).first;  // get filename
 		(*itr).second = textureIds[i];    // save texture id for filename in map
-		printf("Texture loaded: %s\n",filename.c_str());
-		printf("Texture ID Map End: %i\n",textureIdMap.end());
 		ilBindImage(imageIds[i]); /* Binding of DevIL image name */
 		ilEnable(IL_ORIGIN_SET);
-		ilOriginFunc(IL_ORIGIN_LOWER_LEFT); 
+		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+
 		success = ilLoadImage((ILstring)filename.c_str());
 
 		if (success) {
@@ -147,13 +150,17 @@ void Model::initTextures(const aiScene* scene) {
 				ilGetData()); 
 		}
 		else 
-			printf("Couldn't load Image: %s\n", filename.c_str());
+			printf("[Model] :: Couldn't load Image: %s\n", filename.c_str());
+		
 	}
 	/* Because we have already copied image data into texture data  we can release memory used by image. */
 	ilDeleteImages(numTextures, imageIds); 
 	//Cleanup
 	delete [] imageIds;
 	delete [] textureIds;
+
+	std::cout << "Exiting mutex lock." << std::endl;
+	pthread_mutex_unlock(&_loadTextureMutex);
 }
 
 void Model::initModel(const aiScene* scene){
@@ -206,21 +213,30 @@ void Model::initDisplayList(){
 }
 
 void Model::drawFromDisplayList(){
+	LOGGER_ENTER("Model", "drawFromDisplayList");
 	glCallList(displayListID);
+	LOGGER_EXIT;
 }
 
 aiNode* Model::findNodeRecurse(aiNode* node, aiString name){
-	if(node->mName == name)
+	LOGGER_ENTER("Model", "findNodeRecurse");
+	if(node->mName == name){
+		LOGGER_EXIT;
 		return node;
+	}
 	for(unsigned int i = 0; i < node->mNumChildren; i++){
 		aiNode* n = findNodeRecurse(node->mChildren[i], name);
-		if(n != NULL)
+		if(n != NULL){
+			LOGGER_EXIT;
 			return n;
+		}
 	}
+	LOGGER_EXIT;
 	return NULL;
 }
 
 void Model::animate(float t){
+	LOGGER_ENTER("Model", "animate");
 	if(!model->HasAnimations())
 		return;
 
@@ -242,7 +258,7 @@ void Model::animate(float t){
 				break;
 			}
 			if(chan->mScalingKeys[scaleIndex].mTime <= time && time < chan->mScalingKeys[scaleIndex + 1].mTime){
-				float pFactor = (time - chan->mScalingKeys[scaleIndex].mTime) / (chan->mScalingKeys[scaleIndex + 1].mTime - chan->mScalingKeys[scaleIndex].mTime);
+				double pFactor = (time - chan->mScalingKeys[scaleIndex].mTime) / (chan->mScalingKeys[scaleIndex + 1].mTime - chan->mScalingKeys[scaleIndex].mTime);
 				currScale.x = (chan->mScalingKeys[scaleIndex].mValue.x * (1 - pFactor)) + (chan->mScalingKeys[scaleIndex + 1].mValue.x * pFactor);
 				currScale.y = (chan->mScalingKeys[scaleIndex].mValue.y * (1 - pFactor)) + (chan->mScalingKeys[scaleIndex + 1].mValue.y * pFactor);
 				currScale.x = (chan->mScalingKeys[scaleIndex].mValue.z * (1 - pFactor)) + (chan->mScalingKeys[scaleIndex + 1].mValue.z * pFactor);
@@ -327,9 +343,11 @@ void Model::animate(float t){
 
 		targetNode->mTransformation = transformMatrix * scalingMatrix;
 	}
+	LOGGER_EXIT;
 }
 
 void Model::recursiveRender(const aiNode* node){
+	LOGGER_ENTER("Model", "recursiveRender");
 	glPushMatrix();
 	int m = node->mNumMeshes;
 	aiMatrix4x4 masterTransform = node->mTransformation;
@@ -488,19 +506,21 @@ void Model::recursiveRender(const aiNode* node){
 		recursiveRender(node->mChildren[i]);
 	}
 	glPopMatrix();
+	LOGGER_EXIT;
 }
 
 void Model::drawModel(){
+	LOGGER_ENTER("Model", "drawModel");
 	glPushMatrix();
 	glScalef(modelScale, modelScale, modelScale);
 	recursiveRender(model->mRootNode);
 	glPopMatrix();
+	LOGGER_EXIT;
 }
 
 std::map<std::string, Mesh> Model::getMeshes(){
 	gettingVertsAndNormals = true;
 	this->drawModel();
 	gettingVertsAndNormals = false;
-
 	return std::map<std::string, Mesh>(meshesMap);
 }

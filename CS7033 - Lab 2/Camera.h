@@ -9,6 +9,7 @@
 #include "Util.h"
 #include "ModelTimings.h"
 #include "ControllingMesh.h"
+#include "DebugInfoScreen.h"
 
 /* Local Libraries */
 #include "gl/glu.h"
@@ -34,7 +35,12 @@
 #define INDEX_CAM_STRAFE_ACCEL 2
 #define CAM_FADE_SPEED 0.01f
 
-static std::deque<std::string> debugText;
+//struct DebugText{
+//	std::string text;
+//	float color[3];
+//};
+//
+//static std::deque<DebugText> debugText;
 
 class Camera{
 private:
@@ -92,13 +98,17 @@ public:
 	glm::vec3 targetPosition();
 	void confirmMove();
 	void showDebug(bool t){ drawDebug = t; };
+	void clearDebug();
 	void toggleDebug(){ drawDebug = !drawDebug; };
 	void toggleFlashlight(){ flashlightOn = !flashlightOn; };
 	void flashlight();
 	glm::vec3 getPos(){ return position; };
 	glm::vec3 getOrientation(){ return orientation; };
 	glm::vec3 getOrientationAsNormal();
-	static void debug(std::string);
+	//static void debug(std::string);
+	//static void debug(std::string, float, float, float);
+	//static void debug(std::string, float[]);
+	//static void debug(DebugText);
 	int getHealth(){ return playerHealth; };
 	void damage(int);
 	bool checkCollision(glm::vec3);

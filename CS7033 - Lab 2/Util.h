@@ -13,9 +13,12 @@
 #define ACTION_FIRE_PROJECTILE_SLOW 1
 
 #include <glm.hpp>
+#include "Logger.h"
+
 class Util{
 public:
 	static bool lineTriangleIntersection(glm::vec3 p0, glm::vec3 dir, glm::vec3 v0, glm::vec3 v1, glm::vec3 v2){
+		LOGGER_ENTER("Util", "lineTriangleIntersection");
 		/* Get edge vectors and normal */
 		glm::vec3 e0 = v1 - v0;
 		glm::vec3 e1 = v2 - v0;
@@ -57,6 +60,7 @@ public:
 		if(t < 0 || (s + t) > 1)
 			return false;
 		return true;
+		LOGGER_EXIT;
 	}
 };
 

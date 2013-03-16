@@ -15,12 +15,14 @@
 #include <string.h>
 #include "textureTGA.h"
 #include "assimp/Importer.hpp"      // C++ importer interface
-
+#include "DebugInfoScreen.h"
 #include <mmsystem.h>	// ditto
 #include <iostream>		// I/O
 #include "GL/glut.h"	// GLUT
+#include "Logger.h"
 
 #include <fstream>
+#include <pthread.h>
 
 void setupScene();
 void updateScene();
@@ -65,22 +67,6 @@ void calculateFPS(){
     }
 }
 
-void endGameScreen(){
-	gluLookAt(0, 0, 20, 0, 0, 0, 0, 1, 0);
-
-	glDisable(GL_LIGHTING);
-	glColor3f(1, 1, 1);
-	glFontBegin(&font);
-	std::ostringstream scoreString;
-	scoreString << "Score - " << score;
-
-	glFontTextOut("Game Over!", -2, 5, 0);
-	glFontTextOut((char*)scoreString.str().c_str(), -2, -5, 0);
-	glFontEnd();
-	glEnable(GL_LIGHTING);
-	glutSwapBuffers();
-}
-
 void renderScene(){
     /* Clear and set-up GL states */
 	glClearColor(0,0,0,0);
@@ -88,11 +74,7 @@ void renderScene(){
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glColor3f(1, 1, 1);
-
-	if(gameEnd){
-		endGameScreen();
-		return;
-	}
+	glEnable(GL_LIGHTING);
 
 	//shader->bind();
 
@@ -100,35 +82,21 @@ void renderScene(){
 	camera->look();
 	
 
-	/* Draw Models */
+	///* Draw Models */
 	glPushMatrix();
 		glTranslatef(0, 0, 10);
 		bouncingBall->drawModel();
 	glPopMatrix();
 
 	glPushMatrix();
-	
-	level->draw();
+		level->draw();
 	glPopMatrix();
-	//zombie->draw();
+
 	zombieController->draw();
 
 	for(unsigned int i = 0; i < projectiles.size(); i++){
 		projectiles[i].draw();
 	}
-
-	glDisable(GL_LIGHTING);
-	glColor3f(1, 1, 1);
-	glFontBegin(&font);
-	std::ostringstream scoreString;
-	scoreString << "Score - " << score;
-	std::ostringstream healthString;
-	healthString << "Health - " << camera->getHealth();
-
-	glFontTextOut((char*)scoreString.str().c_str(), 0, 15, -80);
-	glFontTextOut((char*)healthString.str().c_str(), 0, 13, -80);
-	glFontEnd();
-	glEnable(GL_LIGHTING);
 
 	/* Collect debug information */
 	std::ostringstream fpsDebug;
@@ -137,12 +105,17 @@ void renderScene(){
 	fpsDebug << FPS << " FPS";
 	runTimeDebug << "Game Time: " << GAME_TIME;
 
-	/* Print debug and fade screen */
-	camera->debug(fpsDebug.str());
-	camera->debug(runTimeDebug.str());
 	camera->drawOverlay();
-	
-	//shader->unbind();
+
+	/* Print debug and fade screen */
+	std::vector<std::string> functionRunTimes = Logger::runTimesVector();
+	for(int i = 0; i < functionRunTimes.size(); i++)
+		DebugInfoScreen::debug(functionRunTimes[i]);
+	Logger::resetRunTimes();
+	DebugInfoScreen::debug(fpsDebug.str(), 255, 255, 0);
+	DebugInfoScreen::debug(runTimeDebug.str());
+	DebugInfoScreen::showDebugInfo();
+
 
 	/* Swap buffers */
     glutSwapBuffers();
@@ -170,26 +143,6 @@ float lastSpawnTime;
 float zombieSpawnTime;
 void updateScene(){
 	GAME_TIME = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
-
-	if(GAME_TIME - lastSpawnTime > zombieSpawnTime && lastSpawnTime != -1 && !zombieController->full()){
-		zombieController->addZombieBehindPoint(level, camera->getPos(), camera->getOrientationAsNormal());
-		lastSpawnTime = GAME_TIME;
-		std::cout << "Spawning du to time;";
-	}
-
-	for(unsigned int i = 0; i < projectiles.size(); i++){
-		projectiles[i].update();
-		if(projectiles[i].hasExpired())
-			projectiles.erase(projectiles.begin() + i);
-		else{
-			int hits = zombieController->collideAndKill(projectiles[i].getPosition(), projectiles[i].getVelocity());
-			if(hits > 0){
-				zombieController->addZombieBehindPoint(level, camera->getPos(), camera->getOrientationAsNormal());
-				score += hits;
-				std::cout << "Score = " << score << std::endl;
-			}
-		}
-	}
 
 	zombieController->allFollow(camera->getPos());
 
@@ -241,14 +194,16 @@ void KeyboardPress(unsigned char key, int x, int y){
 	}
 
 	if(key == 'l' || key == 'L'){
+		DebugInfoScreen::log("Toggle flashlight");
 		camera->toggleFlashlight();
 	}
 
 	if(key == 'f' || key == 'F')
 		glutFullScreenToggle();
 
-	if(key == 't' || key == 'T')
+	if(key == '~'){
 		camera->toggleDebug();
+	}
 
 	if(key == 'k' || key == 'K')
 		camera->fadeToggle();
@@ -316,6 +271,7 @@ void setViewport(int width, int height) {
 	camera->setScreenSize(width, height);
 	camera->changeFOV(45);
 	camera->warpPointerToCenter();
+	DebugInfoScreen::setScreenSize(width, height);
 }
 
 void PressKey(int key, int x, int y){
@@ -359,12 +315,15 @@ void mousePress(int button, int state, int x, int y){
 
 int main(int argc, char *argv[]){
     // Initialise OpenGL
-    glutInit(&argc, argv); 
+    glutInit(&argc, argv);
+	Logger::initLogger();
+	unsigned int t = Logger::enterFunction("Class", "Func");
 	
 
     // Set window position, size & create window
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowPosition(1500,300);
+	glutInitWindowPosition(0,0);
+	glutInitWindowSize(640, 480);
 
 	/* Set up the camera */
 	camera = new Camera();
@@ -394,9 +353,13 @@ int main(int argc, char *argv[]){
     // Setup OpenGL state & scene resources (models, textures etc)
     setupScene();
 
+	Logger::exitFunction(t);
+	Logger::printRunTimes();
+
     // Show window & start update loop
-	glutFullScreen();
+	//glutFullScreen();
 	camera->warpPointerToCenter();
+
     glutMainLoop(); 
 
     return 0;

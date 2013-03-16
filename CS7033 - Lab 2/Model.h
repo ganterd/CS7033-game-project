@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <Windows.h>
 #include <GL\GL.h>
@@ -12,6 +11,8 @@
 #include <map>
 #include <vector>
 #include <iterator>
+#include <pthread.h>
+#include "Logger.h"
 
 struct Mesh{
 	glm::vec3* vertices;
@@ -39,6 +40,8 @@ private:
 	float time;
 	std::map<std::string, aiNodeAnim*> nodeAnimationMap;
 
+	/* Thread specific variables */
+
 	aiMatrix3x3 MODEL_ROT_MAT;
 
 	/* Temp Veriables for getVertices and getNormals */
@@ -57,9 +60,13 @@ public:
 	~Model();
 
 	bool loadModel(const char*);
+
 	void initModel(const aiScene*);
+
 	void setLighting();
 	void initDisplayList();
+	void* initDisplayListThread();
+
 	void drawModel();
 	void drawFromDisplayList();
 	void setYUp(bool y){ yUp = y; };
@@ -67,6 +74,21 @@ public:
 	void animate(float);
 
 	std::map<std::string, Mesh> getMeshes();
+
+
 };
 
-#endif
+struct _loadModelThreadArgs{
+	const char* path;
+	Model* m;
+};
+
+static void* _loadModelThread(void* threadArgs){
+	_loadModelThreadArgs* argv = (_loadModelThreadArgs*) threadArgs;
+	Model* model = argv->m;
+	model->loadModel(argv->path);
+	pthread_exit(NULL);
+	return NULL;
+}
+
+static pthread_mutex_t _loadTextureMutex = PTHREAD_MUTEX_INITIALIZER;

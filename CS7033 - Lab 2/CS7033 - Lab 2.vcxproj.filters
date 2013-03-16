@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Debug and Log">
+      <UniqueIdentifier>{a3e8aa83-5dd5-4e02-bd80-b5ef76645843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Debug and Log">
+      <UniqueIdentifier>{5ef0d746-f89b-465a-a941-455af6db573a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="textureTGA.cpp">
@@ -50,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="glfont.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files\Debug and Log</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugInfoScreen.cpp">
+      <Filter>Source Files\Debug and Log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,18 +104,18 @@
     <ClInclude Include="glfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugInfoScreen.h">
+      <Filter>Header Files\Debug and Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files\Debug and Log</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Shader.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Shader2.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Shader2.vert">
+    <None Include="Shader.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -16,20 +16,49 @@ Level::Level(std::string levelName){
 	levelSpawnPointsName.append(levelName).append("_SPAWNS.dae");
 
 	levelModel = new Model();
-	if(!levelModel->loadModel(levelModelName.c_str())){
-		levelModel = NULL;
-		return;
+	skyBox = new Model();
+
+	std::cout << "[Level] Starting loader threads..." << std::endl;
+	pthread_t loadModelThreads[5];
+	_loadModelThreadArgs loadModelThreadArgs[5];
+	loadModelThreadArgs[0].path = levelModelName.c_str();
+	loadModelThreadArgs[1].path = levelSkyBoxName.c_str();
+	loadModelThreadArgs[2].path = levelBoundaryMeshName.c_str();
+	loadModelThreadArgs[3].path = levelControlMeshName.c_str();
+	loadModelThreadArgs[4].path = levelSpawnPointsName.c_str();
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+	Model* loadedModels[5];
+
+	int rc;
+	for(int i = 0; i < 5; i++){
+		loadedModels[i] = new Model();
+		loadModelThreadArgs[i].m = loadedModels[i];
+		rc = pthread_create(&loadModelThreads[i], &attr, _loadModelThread, (void *)&loadModelThreadArgs[i]);
 	}
 
+	pthread_attr_destroy(&attr);
+	for(int i = 0; i < 5; i++){
+		void* s;
+		pthread_join(loadModelThreads[i], &s);
+	}
+
+	levelModel = loadedModels[0];
+	skyBox = loadedModels[1];
+
+	boundaryMesh = new ControllingMesh();
+	controlMesh = new ControllingMesh();
+	spawnPoints = new ControllingMesh();
+
+	boundaryMesh->loadFromModel(loadedModels[2]);
+	controlMesh->loadFromModel(loadedModels[3]);
+	spawnPoints->loadFromModel(loadedModels[4]);
+
 	levelModel->initDisplayList();
-
-	skyBox = new Model();
-	skyBox->loadModel(levelSkyBoxName.c_str());
 	skyBox->initDisplayList();
-
-	boundaryMesh = new ControllingMesh(levelBoundaryMeshName);
-	controlMesh = new ControllingMesh(levelControlMeshName);
-	spawnPoints = new ControllingMesh(levelSpawnPointsName);
 }
 
 void Level::draw(){
@@ -48,11 +77,12 @@ void Level::draw(){
 	glPushMatrix();
 		levelModel->drawFromDisplayList();
 	glPopMatrix();
-	//boundaryMesh->drawMeshes();
 }
 
 bool Level::outOfBounds(glm::vec3 position){
+	LOGGER_ENTER("Level", "outOfBounds");
 	std::string intersectedMesh = boundaryMesh->inMesh(position);
+	LOGGER_EXIT;
 	return !intersectedMesh.empty();
 }
 
@@ -71,11 +101,13 @@ void Level::setEventEncoutered(unsigned int controlEventID){
 }
 
 unsigned int Level::controllerInteraction(glm::vec3 p){
+	LOGGER_ENTER("Level", "controlerInteration");
 	if(strcmp(controlMesh->inMesh(p).c_str(), "CMESH_WEAPON_SLING-material") == 0)
 		if(!encounteredEvent(LEVEL_GIVEWEAPON_SLINGSHOT)){
 			setEventEncoutered(LEVEL_GIVEWEAPON_SLINGSHOT);
 			return LEVEL_GIVEWEAPON_SLINGSHOT;
 		}
+	LOGGER_EXIT;
 	return 0;
 }
 

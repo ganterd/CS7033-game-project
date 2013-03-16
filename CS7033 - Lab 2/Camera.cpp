@@ -117,9 +117,9 @@ void Camera::look(){
 	orientationDebug << "[CAM] Orientation [" << orientation[CAM_YAW] << ", " << orientation[CAM_PITCH] << ", " << orientation[CAM_ROLL] << "]";
 	fovDebug << "[CAM] FOV = " << currentFOV;
 	
-	debugText.push_back(positionDebug.str());
-	debugText.push_back(orientationDebug.str());
-	debugText.push_back(fovDebug.str());
+	DebugInfoScreen::debug(positionDebug.str());
+	DebugInfoScreen::debug(orientationDebug.str());
+	DebugInfoScreen::debug(fovDebug.str());
 }
 
 void Camera::animate(float gameTime){
@@ -141,69 +141,11 @@ void Camera::animate(float gameTime){
 
 void Camera::drawOverlay(){
 	glPushMatrix();
-		glTranslatef(position[INDEX_CAM_X], position[INDEX_CAM_Y] - 0.2, position[INDEX_CAM_Z]);
+		glTranslatef(position[INDEX_CAM_X], position[INDEX_CAM_Y] - 0.2f, position[INDEX_CAM_Z]);
 		glRotatef(-orientation[CAM_YAW] + 90, 0,1,0);
 		glRotatef(-orientation[CAM_PITCH], 1,0,0);
 		arms->drawModel();
 	glPopMatrix();
-
-	if(currentFade > 1 || currentFade < 0){
-		currentFade = targetFade;
-	}else{
-		if(targetFade > currentFade){
-			currentFade += CAM_FADE_SPEED;
-		}else{
-			currentFade -= CAM_FADE_SPEED;
-		}
-	}
-
-	/* Switch Draw Mode */
-	glPushMatrix();			// 1
-		glDisable(GL_LIGHTING);
-		glEnable(GL_PROJECTION);
-		glPushMatrix(); // 2
-			glLoadIdentity();	
-			glMatrixMode(GL_MODELVIEW);
-			glOrtho(0, screenAttr[INDEX_SCREEN_WIDTH], screenAttr[INDEX_SCREEN_HEIGHT], 0, -1, 1);
-			
-			glPushMatrix(); // 3
-				glLoadIdentity();
-	
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glColor4f(0, 0, 0, currentFade);
-				glBegin(GL_QUADS);
-					glVertex2f(0, 0);
-					glVertex2f(screenAttr[INDEX_SCREEN_WIDTH], 0);
-					glVertex2f(screenAttr[INDEX_SCREEN_WIDTH], screenAttr[INDEX_SCREEN_WIDTH]);
-					glVertex2f(0, screenAttr[INDEX_SCREEN_WIDTH]);
-				glEnd();
-				glDisable(GL_BLEND);
-
-				if(drawDebug){
-					glColor3f( 255, 255, 255 );
-
-					for(unsigned int w = 0; w < debugText.size(); w++){
-						glRasterPos2i(10, 20 + (15 * w));
-						const char* str = debugText[w].c_str();
-						int len, i;
-						len = (int)strlen(str);
-						for (i = 0; i < len; i++) {
-							glutBitmapCharacter(GLUT_BITMAP_9_BY_15, str[i]);		
-						}
-		
-					}
-					debugText.clear();
-				}
-	
-			glPopMatrix(); // 3
-		glPopMatrix(); // 2
-		glEnable(GL_LIGHTING);
-	glPopMatrix(); // 1
-
-	std::ostringstream fadeDebug;
-	fadeDebug << "[CAM] Fade = " << currentFade;
-	debugText.push_back(fadeDebug.str());
 }
 
 void Camera::update(){
@@ -217,10 +159,6 @@ void Camera::update(){
 		gluPerspective((int)currentFOV, screenAttr[INDEX_SCREEN_RATIO], .1, 1000);
 	}
 	this->flashlight();
-}
-
-void Camera::debug(std::string s){
-	debugText.push_back(s);
 }
 
 void Camera::setScreenSize(int width, int height){
@@ -309,14 +247,9 @@ void Camera::flashlight(){
 	std::ostringstream flashLightOnDebug;
 
 	if(!flashlightOn){
-		flashLightOnDebug << "[Camera] Flashlight OFF";
-		Camera::debug(flashLightOnDebug.str());
 		glDisable(GL_LIGHT5);
 		return;
 	}
-
-	flashLightOnDebug << "[Camera] Flashlight ON";
-	Camera::debug(flashLightOnDebug.str());
 
 	glPushMatrix();
 
