@@ -2,4 +2,6 @@
 Debug/
 ipch/
 x64/
+
+# Ignore file types
 *.sdf
