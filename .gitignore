@@ -5,3 +5,4 @@ x64/
 
 # Ignore file types
 *.sdf
+*.opensdf
