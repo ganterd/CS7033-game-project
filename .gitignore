@@ -1,4 +1,8 @@
 # Ignore directorys
+Debug\
+ipch\
+x64\
+
 Debug/
 ipch/
 x64/
@@ -6,3 +10,10 @@ x64/
 # Ignore file types
 *.sdf
 *.opensdf
+*.tlog
+*.log
+*.obj
+*.idb
+*.pdb
+*.lastbuildstate
+*.exe
