@@ -1,0 +1,5 @@
+# Ignore directorys
+Debug/
+ipch/
+x64/
+*.sdf
